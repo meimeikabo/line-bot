@@ -3,11 +3,10 @@ const bodyParser = require("body-parser");
 const axios = require("axios");
 
 // ← LINEチャネルアクセストークンをここに貼る
-const LINE_CHANNEL_ACCESS_TOKEN =
-  "BoEKmG77d47KaMw7/NhJ+lKkdrAj+bmmunZyXQzDfM5UpIEjgaormsVJ8G5sPtFyRqlz4+UD31IEOK1F82mtHNNdRRcIRIe6VE5I9mgBLm3v/9/5YBcdz/UXXIItNTaQk67v5uQn3uDsiixxHXQ4BwdB04t89/1O/w1cDnyilFU=";
+const LINE_CHANNEL_ACCESS_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
