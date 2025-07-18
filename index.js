@@ -2,8 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const axios = require("axios");
 
-// ← LINEチャネルアクセストークンをここに貼る
 const LINE_CHANNEL_ACCESS_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,16 +18,32 @@ app.post("/webhook", async (req, res) => {
       const userMessage = event.message.text;
       const replyToken = event.replyToken;
 
+      // GPTの返答を取得
+      const chatGPTReply = await axios.post(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          model: "gpt-3.5-turbo", // 無料枠で使いたい場合
+          messages: [
+            { role: "system", content: "あなたは親切なアシスタントです。" },
+            { role: "user", content: userMessage },
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
+          },
+        }
+      );
+
+      const replyText = chatGPTReply.data.choices[0].message.content;
+
+      // LINEに返信
       await axios.post(
         "https://api.line.me/v2/bot/message/reply",
         {
           replyToken: replyToken,
-          messages: [
-            {
-              type: "text",
-              text: `あなたは「${userMessage}」といいましたね！`,
-            },
-          ],
+          messages: [{ type: "text", text: replyText }],
         },
         {
           headers: {
