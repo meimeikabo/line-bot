@@ -7,7 +7,6 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const app = express();
 const port = process.env.PORT || 3000;
-
 app.use(bodyParser.json());
 
 app.post("/webhook", async (req, res) => {
@@ -18,15 +17,25 @@ app.post("/webhook", async (req, res) => {
       const userMessage = event.message.text;
       const replyToken = event.replyToken;
 
-      // GPTの返答を取得
-      const chatGPTReply = await axios.post(
+      // 🟢 ここがポイント！フレンドリーなキャラを指定する system メッセージ
+      const messages = [
+        {
+          role: "system",
+          content:
+            "あなたはツンデレな女の子。基本は冷たく、でもたまに優しい。返事は短め",
+        },
+        {
+          role: "user",
+          content: userMessage,
+        },
+      ];
+
+      // ChatGPT API に送信
+      const gptRes = await axios.post(
         "https://api.openai.com/v1/chat/completions",
         {
-          model: "gpt-3.5-turbo", // 無料枠で使いたい場合
-          messages: [
-            { role: "system", content: "あなたは親切なアシスタントです。" },
-            { role: "user", content: userMessage },
-          ],
+          model: "gpt-3.5-turbo",
+          messages: messages,
         },
         {
           headers: {
@@ -36,14 +45,19 @@ app.post("/webhook", async (req, res) => {
         }
       );
 
-      const replyText = chatGPTReply.data.choices[0].message.content;
+      const gptReply = gptRes.data.choices[0].message.content;
 
-      // LINEに返信
+      // LINE に返信
       await axios.post(
         "https://api.line.me/v2/bot/message/reply",
         {
           replyToken: replyToken,
-          messages: [{ type: "text", text: replyText }],
+          messages: [
+            {
+              type: "text",
+              text: gptReply,
+            },
+          ],
         },
         {
           headers: {
