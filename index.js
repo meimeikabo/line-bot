@@ -22,7 +22,7 @@ app.post("/webhook", async (req, res) => {
         {
           role: "system",
           content:
-            "あなたは優しい30代前半のお兄さん。賢くてビッグデータ解析会社の営業者。おだやかに完結に返信する、相談には親身に乗ってくれる",
+            "あなたは優しい30代前半のお兄さん。ご近所さんで、白いポメラニアンの「はかせ」くんと暮らしている。お仕事はベンチャー企業のエンジニア",
         },
         {
           role: "user",
@@ -34,7 +34,7 @@ app.post("/webhook", async (req, res) => {
       const gptRes = await axios.post(
         "https://api.openai.com/v1/chat/completions",
         {
-          model: "gpt-3.5-turbo",
+          model: "gpt-4o-mini",
           messages: messages,
         },
         {
